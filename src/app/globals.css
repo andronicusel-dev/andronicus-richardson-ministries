@@ -1,0 +1,420 @@
+@import "tailwindcss";
+
+/*
+  Andronicus Richardson Ministries — design tokens
+  Green : the deep green of the sanctuary and the church grounds
+  Gold  : the light coming through the windows; the one accent
+  Paper : the printed Sunday bulletin
+*/
+@theme {
+  --font-display: "Marcellus", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  --font-serif: "EB Garamond Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-night-950: #0b1c12;
+  --color-night-900: #102a1b;
+  --color-night-800: #173e28;
+  --color-night-700: #215a3a;
+  --color-night-600: #2e7a4d;
+  --color-night-300: #a9c8ae;
+
+  --color-brass-200: #fbf0c4;
+  --color-brass-300: #f0d27b;
+  --color-brass-400: #dfb94f;
+  --color-brass-500: #c99c2f;
+  --color-brass-700: #7d5c12;
+
+  --color-paper: #f7f2e8;
+  --color-paper-deep: #eef0e2;
+  --color-card: #fffdf8;
+  --color-ink: #14251a;
+  --color-ink-soft: #516455;
+  --color-rule: #d6d8c3;
+  --color-alert: #9b2226;
+  --color-good: #215a3a;
+}
+
+@layer base {
+  html {
+    background: var(--color-night-950);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-brass-300);
+    color: var(--color-night-950);
+  }
+
+  /* Two-tone ring: the dark band shows on paper, the brass band shows on the dark sections. */
+  :focus-visible {
+    outline: 2px solid var(--color-brass-400);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-night-800);
+  }
+
+  summary {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* ── Type helpers ─────────────────────────────────────────── */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .prose-body > p + p {
+    margin-top: 1.15em;
+  }
+
+  /* ── Buttons ──────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3.25rem;
+    padding: 0.8rem 1.75rem;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-align: center;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .btn:disabled {
+    cursor: progress;
+    opacity: 0.65;
+  }
+
+  .btn-brass {
+    background: var(--color-brass-300);
+    color: var(--color-night-950);
+  }
+  .btn-brass:hover {
+    background: var(--color-brass-200);
+  }
+
+  .btn-light {
+    border-color: rgb(247 242 232 / 0.4);
+    color: var(--color-paper);
+  }
+  .btn-light:hover {
+    border-color: var(--color-brass-300);
+    color: var(--color-brass-200);
+  }
+
+  .btn-ink {
+    background: var(--color-night-800);
+    color: var(--color-paper);
+  }
+  .btn-ink:hover {
+    background: var(--color-night-600);
+  }
+
+  .btn-line {
+    border-color: rgb(31 22 40 / 0.4);
+    color: var(--color-ink);
+  }
+  .btn-line:hover {
+    background: var(--color-night-800);
+    border-color: var(--color-night-800);
+    color: var(--color-paper);
+  }
+
+  /* A text link with a rule that draws in from the left. */
+  .link-rule {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-block: 0.6rem;
+    background: linear-gradient(currentColor, currentColor) left calc(100% - 0.35rem) / 2.25rem 1px no-repeat;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: background-size 0.35s ease;
+  }
+  .link-rule:hover {
+    background-size: 100% 1px;
+  }
+
+  /* ── The bulletin: dotted leaders between a service and its time ── */
+  .leader {
+    flex: 1 1 2rem;
+    min-width: 2rem;
+    border-bottom: 2px dotted currentColor;
+    opacity: 0.35;
+    transform: translateY(-0.3em);
+  }
+
+  /* ── Backgrounds ──────────────────────────────────────────── */
+  .hero-light {
+    background-color: var(--color-night-900);
+    background-image:
+      radial-gradient(58rem 38rem at 82% 22%, rgb(240 210 123 / 0.16), transparent 62%),
+      radial-gradient(48rem 32rem at 0% 115%, rgb(46 122 77 / 0.5), transparent 62%);
+  }
+
+  .glow-up {
+    background-color: var(--color-night-800);
+    background-image: radial-gradient(52rem 26rem at 50% 108%, rgb(240 210 123 / 0.19), transparent 65%);
+  }
+
+  /* ── Public form fields ───────────────────────────────────── */
+  .field-label {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-weight: 600;
+  }
+  .field-optional {
+    color: var(--color-ink-soft);
+    font-weight: 400;
+  }
+  .field-input {
+    display: block;
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.8rem 1rem;
+    background: var(--color-card);
+    border: 1px solid rgb(31 22 40 / 0.32);
+    border-radius: 3px;
+    color: var(--color-ink);
+    font: inherit;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-input:hover {
+    border-color: rgb(31 22 40 / 0.55);
+  }
+  .field-input:focus {
+    border-color: var(--color-night-600);
+    box-shadow: 0 0 0 3px rgb(46 122 77 / 0.22);
+    outline: none;
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--color-alert);
+  }
+  .field-hint {
+    margin-top: 0.4rem;
+    color: var(--color-ink-soft);
+    font-size: 0.95rem;
+  }
+  .field-error {
+    margin-top: 0.4rem;
+    color: var(--color-alert);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -5rem;
+    z-index: 100;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-brass-300);
+    color: var(--color-night-950);
+    font-weight: 600;
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  /* ── Admin ────────────────────────────────────────────────── */
+  .a-card {
+    background: #fff;
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+  }
+  .a-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .a-optional {
+    color: var(--color-ink-soft);
+    font-weight: 400;
+  }
+  .a-hint {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .a-input {
+    display: block;
+    width: 100%;
+    min-height: 2.9rem;
+    padding: 0.6rem 0.8rem;
+    background: #fff;
+    border: 1px solid rgb(31 22 40 / 0.3);
+    border-radius: 4px;
+    color: var(--color-ink);
+    font: inherit;
+  }
+  .a-input:focus {
+    border-color: var(--color-night-600);
+    box-shadow: 0 0 0 3px rgb(46 122 77 / 0.2);
+    outline: none;
+  }
+  .a-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.9rem;
+    padding: 0.55rem 1.25rem;
+    background: var(--color-night-800);
+    border: 1px solid var(--color-night-800);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.15s ease;
+  }
+  .a-btn:hover {
+    background: var(--color-night-600);
+  }
+  .a-btn:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+  .a-btn-quiet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.45rem 0.95rem;
+    background: #fff;
+    border: 1px solid rgb(31 22 40 / 0.3);
+    border-radius: 4px;
+    color: var(--color-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .a-btn-quiet:hover {
+    background: var(--color-paper);
+    border-color: rgb(31 22 40 / 0.55);
+  }
+  .a-btn-danger {
+    border-color: rgb(155 34 38 / 0.45);
+    color: var(--color-alert);
+  }
+  .a-btn-danger:hover {
+    background: #fbeeec;
+    border-color: var(--color-alert);
+  }
+  .a-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: var(--color-paper-deep);
+    color: var(--color-ink-soft);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .a-badge-brass {
+    background: #f8efcc;
+    color: var(--color-brass-700);
+  }
+  .a-badge-new {
+    background: #dfecdc;
+    color: var(--color-night-700);
+  }
+}
+
+/* ── Motion: one quiet entrance for the top of each page ───────── */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.1rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes arch-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 2rem, 0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.rise-1 {
+  animation-delay: 0.1s;
+}
+.rise-2 {
+  animation-delay: 0.22s;
+}
+.rise-3 {
+  animation-delay: 0.34s;
+}
+.arch-in {
+  animation: arch-in 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rise,
+  .arch-in {
+    animation: none;
+  }
+  .link-rule,
+  .btn {
+    transition: none;
+  }
+}
