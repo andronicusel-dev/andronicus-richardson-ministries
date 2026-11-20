@@ -14,6 +14,7 @@ const globalForDb = globalThis as typeof globalThis & {
 export const pool =
   globalForDb.__arenaNextJsPostgresqlPool ??
   new Pool({
+    // The provider's DATABASE_URL supplies its SSL settings; do not disable certificate verification.
     connectionString: databaseUrl,
   });
 

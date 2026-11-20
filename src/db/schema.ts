@@ -86,6 +86,15 @@ export const admins = pgTable("admins", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** Uploaded public-site photographs and logo, stored in Postgres so they survive redeployments. */
+export const siteImages = pgTable("site_images", {
+  slot: text("slot").primaryKey(),
+  contentType: text("content_type").notNull(),
+  dataBase64: text("data_base64").notNull(),
+  altText: text("alt_text").notNull().default(""),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const sessions = pgTable("sessions", {
   tokenHash: text("token_hash").primaryKey(),
   adminId: integer("admin_id")

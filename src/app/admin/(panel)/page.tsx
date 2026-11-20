@@ -82,6 +82,13 @@ export default async function AdminOverviewPage() {
         ))}
       </ul>
 
+      <AdminCard title="Your pictures & logo" className="mt-8">
+        <p className="-mt-3 text-ink-soft">Upload your ministry logo and replace the example pictures with your own photographs.</p>
+        <Link href="/admin/pictures" className="a-btn-quiet mt-4">
+          Change pictures &amp; logo <span aria-hidden="true" className="ml-2">→</span>
+        </Link>
+      </AdminCard>
+
       <AdminCard title="Getting your site ready" className="mt-8">
         <p className="-mt-3 mb-4 text-ink-soft">
           {doneCount === steps.length

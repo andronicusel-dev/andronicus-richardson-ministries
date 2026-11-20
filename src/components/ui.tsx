@@ -14,6 +14,12 @@ export function Mark({ className = "" }: { className?: string }) {
   );
 }
 
+/** Custom uploaded logo, or the ministry's original doorway mark. */
+export function BrandMark({ logoSrc, className = "" }: { logoSrc?: string | null; className?: string }) {
+  if (!logoSrc) return <Mark className={className} />;
+  return <Image src={logoSrc} alt="" width={96} height={96} unoptimized className={`object-contain ${className}`} />;
+}
+
 /** Nested arches, like the recessed mouldings around a church doorway. Decorative. */
 export function ArchLines({ className = "" }: { className?: string }) {
   return (
@@ -54,7 +60,7 @@ export function ArchImage({
       <div aria-hidden="true" className={`absolute -inset-x-3 -top-3 bottom-0 rounded-t-full border-x border-t ${near}`} />
       <div aria-hidden="true" className={`absolute -inset-x-6 -top-6 bottom-0 rounded-t-full border-x border-t ${far}`} />
       <div className="relative aspect-[3/4] overflow-hidden rounded-t-full bg-night-800">
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
+        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} unoptimized={src.startsWith("/api/site-images/")} className="object-cover" />
       </div>
     </div>
   );

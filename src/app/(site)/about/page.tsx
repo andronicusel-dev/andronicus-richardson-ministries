@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Gatherings, PageHero, Prose, Scripture } from "@/components/ui";
 import { getServiceTimes, getSettings } from "@/lib/data";
 import { paragraphs } from "@/lib/format";
+import { getSiteImages } from "@/lib/site-images";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const [settings, services] = await Promise.all([getSettings(), getServiceTimes()]);
+  const [settings, services, images] = await Promise.all([getSettings(), getServiceTimes(), getSiteImages()]);
   const [lede, ...rest] = paragraphs(settings.aboutBody);
 
   return (
@@ -39,8 +40,9 @@ export default async function AboutPage() {
             <div aria-hidden="true" className="absolute -left-3 -top-3 h-full w-full border border-brass-500/60" />
             <div className="relative aspect-[4/5] overflow-hidden bg-night-800">
               <Image
-                src="/images/pews-green.jpg"
-                alt="Well-worn hymnals tucked into the rack of a wooden pew in warm window light"
+                src={images.about.src ?? "/images/pews-green.jpg"}
+                alt={images.about.alt}
+                unoptimized={images.about.custom}
                 fill
                 sizes="(min-width: 1024px) 38vw, 92vw"
                 className="object-cover"

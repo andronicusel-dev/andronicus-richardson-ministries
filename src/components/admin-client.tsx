@@ -8,6 +8,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type FormEvent,
   type ReactNode,
 } from "react";
@@ -136,13 +137,15 @@ export function ConfirmAction({
   );
 }
 
-/** Shows a saved timestamp in the reader's own timezone. */
+const subscribeToNothing = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
+
+/** Shows a saved timestamp in the reader's own timezone without a hydration mismatch. */
 export function LocalTime({ iso }: { iso: string }) {
-  const [text, setText] = useState("");
-  useEffect(() => {
-    setText(new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }));
-  }, [iso]);
-  return <time dateTime={iso}>{text || iso.slice(0, 10)}</time>;
+  const onClient = useSyncExternalStore(subscribeToNothing, clientSnapshot, serverSnapshot);
+  const text = onClient ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : iso.slice(0, 10);
+  return <time dateTime={iso}>{text}</time>;
 }
 
 export function AdminNav({ newPrayers, unreadMessages }: { newPrayers: number; unreadMessages: number }) {
@@ -154,6 +157,7 @@ export function AdminNav({ newPrayers, unreadMessages }: { newPrayers: number; u
     { href: "/admin/sermons", label: "Sermons", badge: 0 },
     { href: "/admin/events", label: "Events", badge: 0 },
     { href: "/admin/services", label: "Service times", badge: 0 },
+    { href: "/admin/pictures", label: "Pictures & logo", badge: 0 },
     { href: "/admin/settings", label: "Site details", badge: 0 },
   ];
 
