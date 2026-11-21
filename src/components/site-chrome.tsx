@@ -9,7 +9,7 @@ export function SiteHeader({ logoSrc }: { logoSrc?: string | null }) {
     <header className="relative z-40 bg-night-950 text-paper">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:py-4">
         <Link href="/" aria-label={`${CHURCH_NAME}, home`} className="flex min-w-0 items-center gap-3 py-1">
-          <BrandMark logoSrc={logoSrc} className="h-10 w-10 shrink-0 text-brass-300" />
+          <BrandMark logoSrc={logoSrc} className="h-12 w-12 shrink-0 text-brass-300" />
           <span className="min-w-0 leading-none">
             <span className="block truncate font-display text-base tracking-wide sm:text-xl">
               Andronicus Richardson
@@ -29,6 +29,7 @@ const EXPLORE = [
   { href: "/about", label: "About the ministry" },
   { href: "/sermons", label: "Sermons" },
   { href: "/events", label: "Events" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/prayer", label: "Prayer requests" },
   { href: "/give", label: "Give" },
 ];
@@ -140,7 +141,7 @@ export function SiteFooter({ settings, services, logoSrc }: { settings: Settings
             </li>
             {process.env.VERCEL !== "1" ? (
               <li>
-                <a href="/andronicus-update-photos-logo.zip" download className="inline-block py-1.5 transition-colors hover:text-brass-200">
+                <a href="/andronicus-gallery-update.zip" download className="inline-block py-1.5 transition-colors hover:text-brass-200">
                   Download website update
                 </a>
               </li>

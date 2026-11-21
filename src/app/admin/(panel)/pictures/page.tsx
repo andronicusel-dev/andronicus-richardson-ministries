@@ -24,7 +24,7 @@ export default async function AdminPicturesPage() {
 
       <div className="mb-7 rounded-md border border-rule bg-white px-5 py-4 text-ink-soft">
         Your pictures are stored with your website&apos;s database, so they stay in place when the site is updated. The
-        original pictures are examples, not photographs of your church.
+        default emblem is a temporary illustration; upload your exact green logo under “Ministry logo” and your portrait under “About page picture.” The example photographs are illustrative, not photographs of your church.
       </div>
 
       {ready ? (

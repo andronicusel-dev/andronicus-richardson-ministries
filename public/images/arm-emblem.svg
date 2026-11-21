@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" role="img" aria-labelledby="title desc">
+  <title id="title">Andronicus Richardson Ministries emblem</title>
+  <desc id="desc">A green circular emblem with a dove, cross and open book.</desc>
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#74ea25"/><stop offset=".52" stop-color="#12a62c"/><stop offset="1" stop-color="#075323"/></linearGradient>
+    <linearGradient id="center" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4fe52c"/><stop offset="1" stop-color="#05782a"/></linearGradient>
+    <path id="topArc" d="M 60 203 A 150 150 0 0 1 360 203"/>
+  </defs>
+  <circle cx="210" cy="202" r="192" fill="#071b10" stroke="#89ef35" stroke-width="5"/>
+  <circle cx="210" cy="202" r="184" fill="none" stroke="url(#ring)" stroke-width="13"/>
+  <circle cx="210" cy="202" r="141" fill="#082d18" stroke="#e9d076" stroke-width="4"/>
+  <circle cx="210" cy="202" r="132" fill="#06180f" stroke="#43d02b" stroke-width="7"/>
+  <path d="M91 224a119 119 0 0 1 238 0v39H91z" fill="url(#center)"/>
+  <path d="M197 139h26v49h45v26h-45v72h-26v-72h-45v-26h45z" fill="#073e1a" stroke="#062611" stroke-width="5"/>
+  <path d="M77 267c59-18 100-6 133 24 33-30 74-42 133-24l-7 31c-56-14-97 0-126 26-29-26-70-40-126-26z" fill="#32c922" stroke="#072612" stroke-width="7"/>
+  <path d="M84 303c55-14 97-1 126 27 29-28 71-41 126-27l-8 23c-49-10-90 6-118 31-28-25-69-41-118-31z" fill="#087e27" stroke="#092b15" stroke-width="6"/>
+  <path d="M129 167c-4-30 13-60 34-82-7 26 0 36 16 42 20 5 27 18 25 29-11-7-21-6-29-1-10 5-19 18-30 26 7-12 6-18 3-20-4 5-11 11-19 14 4-5 6-8 0-8z" fill="#f6f5e8" stroke="#d9dfd3" stroke-width="2"/>
+  <circle cx="184" cy="141" r="2.5" fill="#173a21"/>
+  <path d="M199 143l14 6-15 4z" fill="#e7c46a"/>
+  <text fill="#fffdf4" font-family="Arial,sans-serif" font-size="23" font-weight="700" letter-spacing="1.8"><textPath href="#topArc" startOffset="50%" text-anchor="middle">ANDRONICUS · RICHARDSON</textPath></text>
+  <text x="210" y="378" text-anchor="middle" fill="#f7f5e8" font-family="Arial,sans-serif" font-weight="800" font-size="29" letter-spacing="4">ARM</text>
+  <text x="210" y="399" text-anchor="middle" fill="#e7d28d" font-family="Arial,sans-serif" font-size="11.5" font-weight="700" letter-spacing=".45">RAISING AN EMPOWERED GENERATION FOR CHRIST</text>
+</svg>

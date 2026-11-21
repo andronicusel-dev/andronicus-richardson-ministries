@@ -3,23 +3,23 @@ export const IMAGE_SLOTS = {
   logo: {
     label: "Ministry logo",
     location: "Shown in the website header and footer, beside the ministry name.",
-    tip: "A square PNG with a transparent background works especially well.",
-    defaultSrc: null,
+    tip: "Upload your original green logo. A square PNG with a transparent background works especially well.",
+    defaultSrc: "/images/arm-emblem.svg",
     defaultAlt: "",
   },
   hero: {
     label: "Main home page picture",
     location: "The large arched picture at the top of the home page and on the prayer page.",
     tip: "A tall or portrait photo works best.",
-    defaultSrc: "/images/hero-green.jpg",
-    defaultAlt: "Morning light streaming through the windows of a quiet sanctuary",
+    defaultSrc: "/images/faith-cross.jpg",
+    defaultAlt: "Illustrative image of hands surrounding a glowing cross at sunset",
   },
   welcome: {
     label: "Welcome picture",
     location: "The arched picture beside the welcome message on the home page.",
     tip: "A tall or portrait photo works best.",
-    defaultSrc: "/images/doors-green.jpg",
-    defaultAlt: "Church doors standing open to warm morning sunlight",
+    defaultSrc: "/images/welcome-community.jpg",
+    defaultAlt: "Illustrative image of people greeting each other in warm sunlight",
   },
   sermon: {
     label: "Sermons picture",
@@ -31,9 +31,9 @@ export const IMAGE_SLOTS = {
   about: {
     label: "About page picture",
     location: "The picture beside the story on the About page.",
-    tip: "A portrait photo works well, though any shape can be used.",
-    defaultSrc: "/images/pews-green.jpg",
-    defaultAlt: "Hymnals tucked into a wooden pew",
+    tip: "Upload your portrait here. A tall image works well, though any shape can be used.",
+    defaultSrc: "/images/doors-green.jpg",
+    defaultAlt: "An open church doorway in warm morning light",
   },
 } as const;
 

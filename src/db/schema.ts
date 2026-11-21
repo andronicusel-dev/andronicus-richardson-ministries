@@ -95,6 +95,19 @@ export const siteImages = pgTable("site_images", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** Public program photographs, managed only by signed-in staff. */
+export const galleryPhotos = pgTable("gallery_photos", {
+  id: serial("id").primaryKey(),
+  program: text("program").notNull().default(""),
+  caption: text("caption").notNull().default(""),
+  altText: text("alt_text").notNull().default(""),
+  photoDate: date("photo_date", { mode: "string" }),
+  contentType: text("content_type").notNull(),
+  dataBase64: text("data_base64").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const sessions = pgTable("sessions", {
   tokenHash: text("token_hash").primaryKey(),
   adminId: integer("admin_id")

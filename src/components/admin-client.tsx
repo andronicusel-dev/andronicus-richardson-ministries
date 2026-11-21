@@ -156,6 +156,7 @@ export function AdminNav({ newPrayers, unreadMessages }: { newPrayers: number; u
     { href: "/admin/messages", label: "Messages", badge: unreadMessages },
     { href: "/admin/sermons", label: "Sermons", badge: 0 },
     { href: "/admin/events", label: "Events", badge: 0 },
+    { href: "/admin/gallery", label: "Gallery", badge: 0 },
     { href: "/admin/services", label: "Service times", badge: 0 },
     { href: "/admin/pictures", label: "Pictures & logo", badge: 0 },
     { href: "/admin/settings", label: "Site details", badge: 0 },

@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/about", label: "About" },
   { href: "/sermons", label: "Sermons" },
   { href: "/events", label: "Events" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/prayer", label: "Prayer" },
   { href: "/contact", label: "Visit" },
 ];

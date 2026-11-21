@@ -12,7 +12,7 @@ The production site is hosted on Vercel and stores its data in Neon PostgreSQL. 
 
 Sign in using the staff link. You can edit service times, sermons, events, contact details, the welcome message and giving links from the admin tabs. Prayer requests and contact messages arrive in the admin inbox; **email alerts are not configured**, so check the inbox regularly.
 
-After installing the pictures-and-logo update, the **Pictures & logo** tab lets staff upload JPG, PNG or WebP files and restore the originals. Uploaded pictures are stored in the database so they persist through Vercel redeployments. The logo appears in the website header and footer; the browser-tab icon remains the original mark. For how to install the update on Windows, see `UPDATE-WEBSITE.md`.
+After installing the gallery update, the **Pictures & logo** tab lets staff upload JPG, PNG or WebP files and restore defaults. The **Gallery** tab lets staff upload, edit, replace and remove program photos. Uploads are stored in the database so they persist through Vercel redeployments. The temporary green emblem is an illustration; upload the ministry's exact logo and portrait in the picture editor. For Windows update instructions, see `UPDATE-WEBSITE.md`.
 
 The starter service times, sermons and events are made-up examples. Replace or remove them before promoting the site. The original photographs are AI-generated examples, not photographs of the church. Online giving appears only after adding a real giving link under **Site details → Giving**.
 

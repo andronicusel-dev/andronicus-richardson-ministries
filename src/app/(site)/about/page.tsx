@@ -40,7 +40,7 @@ export default async function AboutPage() {
             <div aria-hidden="true" className="absolute -left-3 -top-3 h-full w-full border border-brass-500/60" />
             <div className="relative aspect-[4/5] overflow-hidden bg-night-800">
               <Image
-                src={images.about.src ?? "/images/pews-green.jpg"}
+                src={images.about.src ?? "/images/doors-green.jpg"}
                 alt={images.about.alt}
                 unoptimized={images.about.custom}
                 fill

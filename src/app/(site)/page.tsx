@@ -1,20 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { EventRow } from "@/components/lists";
+import { GalleryTeaser } from "@/components/gallery-teaser";
 import { ArchImage, ArchLines, DateTile, Gatherings, Prose, Scripture } from "@/components/ui";
 import { getSermons, getServiceTimes, getSettings, getUpcomingEvents } from "@/lib/data";
 import { formatLongDate, formatMediumDate, paragraphs } from "@/lib/format";
 import { getSiteImages } from "@/lib/site-images";
+import { getGalleryPhotos } from "@/lib/gallery";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [settings, services, sermons, events, images] = await Promise.all([
+  const [settings, services, sermons, events, images, gallery] = await Promise.all([
     getSettings(),
     getServiceTimes(),
     getSermons(3),
     getUpcomingEvents(3),
     getSiteImages(),
+    getGalleryPhotos(3),
   ]);
   const [latest, ...earlier] = sermons;
   const sectionTitle = "text-[clamp(2rem,4.6vw,3.4rem)]";
@@ -179,6 +182,8 @@ export default async function HomePage() {
           </p>
         )}
       </section>
+
+      <GalleryTeaser photos={gallery} />
 
       {/* ── Prayer ── */}
       <section className="glow-up relative overflow-hidden text-paper">
