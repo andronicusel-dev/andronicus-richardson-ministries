@@ -1,15 +1,21 @@
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
-import { BrandMark } from "@/components/ui";
-import type { ServiceTime, Settings } from "@/lib/data";
+import { Mark } from "@/components/ui";
+import { getUploadedImages, type ServiceTime, type Settings } from "@/lib/data";
 import { CHURCH_NAME } from "@/lib/format";
 
-export function SiteHeader({ logoSrc }: { logoSrc?: string | null }) {
+export async function SiteHeader() {
+  const logoVersion = (await getUploadedImages()).get("logo");
   return (
     <header className="relative z-40 bg-night-950 text-paper">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:py-4">
         <Link href="/" aria-label={`${CHURCH_NAME}, home`} className="flex min-w-0 items-center gap-3 py-1">
-          <BrandMark logoSrc={logoSrc} className="h-12 w-12 shrink-0 text-brass-300" />
+          {logoVersion ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={`/media/logo?v=${logoVersion}`} alt="" className="h-11 w-auto max-w-40 shrink-0 object-contain" />
+          ) : (
+            <Mark className="h-10 w-8 shrink-0 text-brass-300" />
+          )}
           <span className="min-w-0 leading-none">
             <span className="block truncate font-display text-base tracking-wide sm:text-xl">
               Andronicus Richardson
@@ -34,7 +40,8 @@ const EXPLORE = [
   { href: "/give", label: "Give" },
 ];
 
-export function SiteFooter({ settings, services, logoSrc }: { settings: Settings; services: ServiceTime[]; logoSrc?: string | null }) {
+export async function SiteFooter({ settings, services }: { settings: Settings; services: ServiceTime[] }) {
+  const logoVersion = (await getUploadedImages()).get("logo");
   const socials = [
     { label: "Facebook", url: settings.facebookUrl },
     { label: "YouTube", url: settings.youtubeUrl },
@@ -48,7 +55,12 @@ export function SiteFooter({ settings, services, logoSrc }: { settings: Settings
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-4">
             <div className="flex items-center gap-4 text-paper">
-              <BrandMark logoSrc={logoSrc} className="h-14 w-14 shrink-0 text-brass-300" />
+              {logoVersion ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={`/media/logo?v=${logoVersion}`} alt="" className="h-14 w-auto max-w-52 shrink-0 object-contain" />
+              ) : (
+                <Mark className="h-14 w-11 shrink-0 text-brass-300" />
+              )}
               <p className="font-display text-2xl leading-tight sm:text-[1.7rem]">
                 Andronicus Richardson
                 <span className="mt-1.5 block font-sans text-[0.68rem] font-semibold uppercase tracking-[0.42em] text-brass-300">
@@ -139,13 +151,6 @@ export function SiteFooter({ settings, services, logoSrc }: { settings: Settings
                 Staff sign-in
               </Link>
             </li>
-            {process.env.VERCEL !== "1" ? (
-              <li>
-                <a href="/andronicus-gallery-update.zip" download className="inline-block py-1.5 transition-colors hover:text-brass-200">
-                  Download website update
-                </a>
-              </li>
-            ) : null}
           </ul>
         </div>
       </div>

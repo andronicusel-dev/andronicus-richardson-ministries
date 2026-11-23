@@ -1,25 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { EventRow } from "@/components/lists";
-import { GalleryTeaser } from "@/components/gallery-teaser";
 import { ArchImage, ArchLines, DateTile, Gatherings, Prose, Scripture } from "@/components/ui";
-import { getSermons, getServiceTimes, getSettings, getUpcomingEvents } from "@/lib/data";
+import { getSermons, getServiceTimes, getSettings, getUpcomingEvents, getUploadedImages, uploadedSrc } from "@/lib/data";
 import { formatLongDate, formatMediumDate, paragraphs } from "@/lib/format";
-import { getSiteImages } from "@/lib/site-images";
-import { getGalleryPhotos } from "@/lib/gallery";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [settings, services, sermons, events, images, gallery] = await Promise.all([
+  const [settings, services, sermons, events, uploads] = await Promise.all([
     getSettings(),
     getServiceTimes(),
     getSermons(3),
     getUpcomingEvents(3),
-    getSiteImages(),
-    getGalleryPhotos(3),
+    getUploadedImages(),
   ]);
   const [latest, ...earlier] = sermons;
+  const bibleSrc = uploadedSrc(uploads, "bible");
   const sectionTitle = "text-[clamp(2rem,4.6vw,3.4rem)]";
 
   return (
@@ -51,8 +48,8 @@ export default async function HomePage() {
           </div>
           <div className="arch-in lg:col-span-5">
             <ArchImage
-              src={images.hero.src ?? "/images/hero-green.jpg"}
-              alt={images.hero.alt}
+              src={uploadedSrc(uploads, "hero")}
+              alt="Morning light streaming through tall windows across the pews of a quiet sanctuary"
               sizes="(min-width: 1024px) 34vw, 20rem"
               priority
               onDark
@@ -73,8 +70,8 @@ export default async function HomePage() {
       <section className="mx-auto grid max-w-7xl items-center gap-16 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:py-28">
         <div className="order-last lg:order-first lg:col-span-5">
           <ArchImage
-            src={images.welcome.src ?? "/images/doors-green.jpg"}
-            alt={images.welcome.alt}
+            src={uploadedSrc(uploads, "doors")}
+            alt="Arched church doors standing open to warm morning sunlight"
             sizes="(min-width: 1024px) 28vw, 18rem"
             className="mx-auto w-full max-w-[16rem] sm:max-w-xs lg:max-w-sm"
           />
@@ -123,11 +120,11 @@ export default async function HomePage() {
                 <div aria-hidden="true" className="absolute -left-3 -top-3 h-full w-full border border-brass-300/40" />
                 <div className="relative aspect-[3/2] overflow-hidden bg-night-800">
                   <Image
-                    src={images.sermon.src ?? "/images/bible-green.jpg"}
-                    alt={images.sermon.alt}
-                    unoptimized={images.sermon.custom}
+                    src={bibleSrc}
+                    alt="An open Bible with gilt-edged pages resting on a wooden pulpit"
                     fill
                     sizes="(min-width: 1024px) 45vw, 92vw"
+                    unoptimized={bibleSrc.startsWith("/media/")}
                     className="object-cover"
                   />
                 </div>
@@ -182,8 +179,6 @@ export default async function HomePage() {
           </p>
         )}
       </section>
-
-      <GalleryTeaser photos={gallery} />
 
       {/* ── Prayer ── */}
       <section className="glow-up relative overflow-hidden text-paper">

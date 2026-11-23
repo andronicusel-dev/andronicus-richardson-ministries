@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Gatherings, PageHero, Prose, Scripture } from "@/components/ui";
-import { getServiceTimes, getSettings } from "@/lib/data";
+import { getServiceTimes, getSettings, getUploadedImages, uploadedSrc } from "@/lib/data";
 import { paragraphs } from "@/lib/format";
-import { getSiteImages } from "@/lib/site-images";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const [settings, services, images] = await Promise.all([getSettings(), getServiceTimes(), getSiteImages()]);
+  const [settings, services, uploads] = await Promise.all([getSettings(), getServiceTimes(), getUploadedImages()]);
+  const pewsSrc = uploadedSrc(uploads, "pews");
+  const leaderSrc = uploadedSrc(uploads, "leader");
   const [lede, ...rest] = paragraphs(settings.aboutBody);
 
   return (
@@ -40,11 +41,11 @@ export default async function AboutPage() {
             <div aria-hidden="true" className="absolute -left-3 -top-3 h-full w-full border border-brass-500/60" />
             <div className="relative aspect-[4/5] overflow-hidden bg-night-800">
               <Image
-                src={images.about.src ?? "/images/doors-green.jpg"}
-                alt={images.about.alt}
-                unoptimized={images.about.custom}
+                src={pewsSrc}
+                alt="Well-worn hymnals tucked into the rack of a wooden pew in warm window light"
                 fill
                 sizes="(min-width: 1024px) 38vw, 92vw"
+                unoptimized={pewsSrc.startsWith("/media/")}
                 className="object-cover"
               />
             </div>
@@ -54,14 +55,29 @@ export default async function AboutPage() {
 
       {settings.leaderName ? (
         <section className="bg-paper-deep">
-          <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:py-24">
-            <div className="lg:col-span-5">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:py-24">
+            {leaderSrc ? (
+              <div className="relative ml-3 mt-3 lg:col-span-4">
+                <div aria-hidden="true" className="absolute -left-3 -top-3 h-full w-full border border-brass-500/60" />
+                <div className="relative aspect-[4/5] overflow-hidden bg-night-800">
+                  <Image
+                    src={leaderSrc}
+                    alt={`Portrait of ${settings.leaderName}`}
+                    fill
+                    sizes="(min-width: 1024px) 30vw, 92vw"
+                    unoptimized={leaderSrc.startsWith("/media/")}
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+            ) : null}
+            <div className={leaderSrc ? "lg:col-span-8" : "lg:col-span-12"}>
               <p className="eyebrow text-brass-700">{settings.leaderTitle || "Leadership"}</p>
               <h2 className="mt-4 text-[clamp(2rem,4.6vw,3.4rem)]">{settings.leaderName}</h2>
+              {settings.leaderBio ? (
+                <Prose text={settings.leaderBio} className="mt-6 max-w-2xl text-lg text-ink-soft" />
+              ) : null}
             </div>
-            {settings.leaderBio ? (
-              <Prose text={settings.leaderBio} className="max-w-2xl text-lg text-ink-soft lg:col-span-7 lg:pt-2" />
-            ) : null}
           </div>
         </section>
       ) : null}

@@ -20,6 +20,7 @@ export default async function AdminOverviewPage() {
     overview.sampleServices ? `${overview.sampleServices} service time${overview.sampleServices === 1 ? "" : "s"}` : "",
     overview.sampleSermons ? `${overview.sampleSermons} sermon${overview.sampleSermons === 1 ? "" : "s"}` : "",
     overview.sampleEvents ? `${overview.sampleEvents} event${overview.sampleEvents === 1 ? "" : "s"}` : "",
+    overview.sampleGallery ? `${overview.sampleGallery} gallery photo${overview.sampleGallery === 1 ? "" : "s"}` : "",
   ].filter(Boolean);
 
   const steps = [
@@ -81,17 +82,6 @@ export default async function AdminOverviewPage() {
           </li>
         ))}
       </ul>
-
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <AdminCard title="Your pictures & logo">
-          <p className="-mt-3 text-ink-soft">Upload your ministry logo and replace the example pictures with your own photographs.</p>
-          <Link href="/admin/pictures" className="a-btn-quiet mt-4">Change pictures &amp; logo <span aria-hidden="true" className="ml-2">→</span></Link>
-        </AdminCard>
-        <AdminCard title="Program gallery">
-          <p className="-mt-3 text-ink-soft">Share photographs from your services, outreach and other ministry programs.</p>
-          <Link href="/admin/gallery" className="a-btn-quiet mt-4">Manage gallery <span aria-hidden="true" className="ml-2">→</span></Link>
-        </AdminCard>
-      </div>
 
       <AdminCard title="Getting your site ready" className="mt-8">
         <p className="-mt-3 mb-4 text-ink-soft">

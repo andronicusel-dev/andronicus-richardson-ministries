@@ -1,32 +1,98 @@
-# Andronicus Richardson Ministries — website guide
+# Putting Andronicus Richardson Ministries online (for real)
 
-## Current website
+The site you see in the workspace is a preview. This guide gets it onto a permanent
+address that anyone can open in a browser. All of the services below have a free
+tier; the only ongoing cost is the custom domain name (roughly $10–25 / year).
 
-- Public site: https://andronicus-richardson-ministries.vercel.app
-- Staff sign-in: https://andronicus-richardson-ministries.vercel.app/admin
-- Website code: https://github.com/andronicusel-dev/andronicus-richardson-ministries
+You will need a computer for steps 1–2. Steps 3 onward are all clicking in the
+browser.
 
-The production site is hosted on Vercel and stores its data in Neon PostgreSQL. Keep the Neon connection string, account passwords and access tokens private; never commit them to GitHub or share them in chat.
+---
 
-## Updating day to day
+## 1. Put the website code on GitHub
 
-Sign in using the staff link. You can edit service times, sermons, events, contact details, the welcome message and giving links from the admin tabs. Prayer requests and contact messages arrive in the admin inbox; **email alerts are not configured**, so check the inbox regularly.
+GitHub stores the code and Vercel reads it from there.
 
-After installing the gallery update, the **Pictures & logo** tab lets staff upload JPG, PNG or WebP files and restore defaults. The **Gallery** tab lets staff upload, edit, replace and remove program photos. Uploads are stored in the database so they persist through Vercel redeployments. The temporary green emblem is an illustration; upload the ministry's exact logo and portrait in the picture editor. For Windows update instructions, see `UPDATE-WEBSITE.md`.
+1. Make a free account at **github.com**.
+2. On github.com click **New repository**, name it `andronicus-richardson-ministries`
+   (public or private both work), and create it.
+3. On your computer, in the folder containing this project, open a terminal and run:
 
-The starter service times, sermons and events are made-up examples. Replace or remove them before promoting the site. The original photographs are AI-generated examples, not photographs of the church. Online giving appears only after adding a real giving link under **Site details → Giving**.
+   ```bash
+   git init
+   git add .
+   git commit -m "Andronicus Richardson Ministries website"
+   git branch -M main
+   git remote add origin https://github.com/YOUR-USERNAME/andronicus-richardson-ministries.git
+   git push -u origin main
+   ```
 
-## Publishing code changes
+   (Ask the person who has this folder for a copy of it if it is not already on
+   your computer — every file in the project folder, including this one.)
 
-The GitHub `main` branch is connected to Vercel. Pushing a commit to `main` triggers a new production deployment. Wait for **Ready** under the Vercel project's **Deployments** tab, then check the public site.
+## 2. Create the database
 
-Back up custom code before overwriting it. Never add `.env`, `.env.local`, database credentials, passwords, or access tokens to Git. The `.gitignore` file excludes the usual local environment files, but always review changes before committing.
+The website stores service times, sermons, events, prayer requests and messages in
+a PostgreSQL database.
 
-## New installation or disaster recovery
+1. Make a free account at **neon.tech** (a "Postgres on the web" service).
+2. Create a new project (the default settings are fine).
+3. Copy the **connection string** (it looks like
+   `postgresql://user:password@host/dbname?sslmode=require`) and save it
+   somewhere safe. You will paste it into Vercel in step 4.
+4. In Neon, open the **PSQL** console tab and paste in the entire contents of
+   **`database-setup.sql`** (next to this file), then run it. This creates all the
+   tables the website needs. Do this once.
 
-1. Create a PostgreSQL database and run `database-setup.sql` in Neon **Postgres database → SQL Editor**. Existing installations need not rerun it for the image editor: the editor creates its image table when an authenticated staff member opens it, assuming the database user has table-creation permission.
-2. In Vercel, import the repository and set the server-side environment variable `DATABASE_URL` to the full **pooled** Neon connection string. Keep that string secret. Choose a branch and database that match the ones where you ran the setup.
-3. Deploy, then immediately open `/admin/setup` and create the staff account before sharing the URL. The first person to **create** the account becomes the administrator.
-4. Add real church details and remove the starter examples.
+## 3. Deploy the website on Vercel
 
-Vercel Hobby and Neon free plans have eligibility rules and usage limits. A custom domain is optional and is usually paid separately. Check the providers' current plans and terms before relying on a free tier.
+1. Make a free account at **vercel.com** (you can sign in with GitHub).
+2. Click **Add New → Project**, choose the repository from step 1, and press
+   **Import**. Vercel recognises the Next.js project by itself.
+3. On the deploy screen, in **Environment Variables**, add one variable:
+   - Name: `DATABASE_URL`
+   - Value: the connection string you copied from Neon in step 2.
+4. Press **Deploy**. Wait a minute or two. Vercel gives you an address like
+   `your-project.vercel.app` — open it and your website is live on the internet.
+
+## 4. Create your admin sign-in on the new site
+
+The new database is empty, so this is a fresh start:
+
+1. Open `your-address/admin` (or click "Staff sign-in" at the bottom of the page).
+2. Choose your email and password. **Do this first** — it only happens once, and
+   whoever opens that page first becomes the administrator.
+3. Fill in your real details: service times, address, phone numbers, email, the
+   online giving link, and your own wording. Remove the starter examples with the
+   button on the Overview page when you have replaced them.
+
+That's it — members of the church now have a real address to bookmark, and every
+prayer request or message they send lands in the admin inbox.
+
+## 5. Get your own domain name (recommended)
+
+1. Buy a domain such as `andronicusrichardsonministries.com` or a `.co.za`
+   address (registrar suggestions: Namecheap, Cloudflare, Dynadot, or any
+   .co.za registrar).
+2. In Vercel: **Project → Settings → Domains → Add**, type your domain.
+3. Vercel shows you two DNS instructions (for example, an A record and a CNAME).
+   Enter those at your domain registrar. Within a few minutes (sometimes a few
+   hours) the site is served from your own address. HTTPS is automatic.
+
+## Keeping it up to date
+
+- **Day-to-day changes** (sermons, events, service times, wording, prayer
+  requests): just use the admin area at `your-address/admin`. No technical steps.
+- **Code changes**: make the change, then on your computer run
+  `git add . && git commit -m "what changed" && git push`. Vercel rebuilds and
+  publishes the new version automatically within a minute or two.
+
+## Handy links after you have deployed
+
+| What | Where |
+| --- | --- |
+| Website | `your-project.vercel.app` (or your domain) |
+| Admin area | `your-project.vercel.app/admin` |
+| Prayer requests & messages | admin → "Prayer requests" / "Messages" |
+| Deploy status | vercel.com → your project |
+| Database | neon.tech → your project |

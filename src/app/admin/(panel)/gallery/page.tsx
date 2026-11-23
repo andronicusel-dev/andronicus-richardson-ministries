@@ -1,33 +1,68 @@
-import { AdminTitle, EmptyNote } from "@/components/admin-ui";
-import { GalleryItemEditor, GalleryUploader } from "@/components/gallery-manager";
+import { deleteGalleryPhoto, saveGalleryPhoto } from "@/app/actions/admin";
+import { ActionForm, ConfirmAction } from "@/components/admin-client";
+import { AField, AdminCard, AdminTitle, EmptyNote, StarterBadge } from "@/components/admin-ui";
+import { PicturePicker } from "@/components/picture-picker";
 import { requireAdmin } from "@/lib/auth";
-import { ensureGalleryTable, getGalleryPhotos } from "@/lib/gallery";
+import { gallerySrc, getGalleryPhotos } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminGalleryPage() {
   await requireAdmin();
-  let ready = true;
-  try { await ensureGalleryTable(); } catch { ready = false; }
-  const photos = ready ? await getGalleryPhotos() : [];
+  const photos = await getGalleryPhotos();
 
   return (
     <>
-      <AdminTitle title="Program gallery">Add, replace or remove photographs from your programs and gatherings.</AdminTitle>
-      <div className="mb-6 rounded-md border border-brass-500/40 bg-[#f7f2da] px-5 py-4 text-ink">
-        Photos added here are visible to everyone. Please get permission from people shown, especially before posting pictures of children.
-      </div>
-      {ready ? (
-        <>
-          <GalleryUploader />
-          <div className="mb-4 mt-10 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="font-sans text-xl font-bold">Photos on your site</h2>
-            <a href="/gallery" target="_blank" rel="noopener" className="font-semibold text-night-700 underline underline-offset-4">View public gallery ↗</a>
+      <AdminTitle title="Gallery">
+        Photos from your services and programs, shown on the Gallery page of your website. Add as many as you
+        like — the newest appears last.
+      </AdminTitle>
+
+      <AdminCard title="Add a photo">
+        <ActionForm action={saveGalleryPhoto} submitLabel="Add to gallery" pendingLabel="Adding…" resetOnSuccess>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <PicturePicker
+              name="file"
+              hint="Any picture format works — JPG, PNG, WebP, GIF, BMP, TIFF, HEIC (iPhone), AVIF or SVG — up to 10 MB. It is converted for you automatically."
+            />
+            <AField
+              label="Caption"
+              name="caption"
+              maxLength={160}
+              placeholder="Easter Sunday service"
+              hint="A few words about the photo. Shown under it on the website."
+            />
           </div>
-          {photos.length ? <div className="space-y-4">{photos.map((photo) => <GalleryItemEditor key={photo.id} photo={photo} />)}</div> : <EmptyNote>No program photos yet. Add your first pictures using the form above.</EmptyNote>}
-        </>
+        </ActionForm>
+      </AdminCard>
+
+      <h2 className="mb-4 mt-10 font-sans text-xl font-bold">In your gallery now</h2>
+      {photos.length === 0 ? (
+        <EmptyNote>No photos yet. Add your first one with the form above.</EmptyNote>
       ) : (
-        <div role="alert" className="rounded-md border border-alert/40 bg-[#fbeeec] p-5 text-alert">The gallery could not be opened. Your website is still working, but a database administrator needs to run the latest database setup before gallery photos can be added.</div>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {photos.map((photo) => (
+            <li key={photo.id} className="a-card overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={gallerySrc(photo)} alt={photo.caption} className="aspect-[4/3] w-full object-cover" />
+              <div className="p-4">
+                <p className="flex min-h-6 flex-wrap items-center gap-2 font-semibold">
+                  {photo.caption || <span className="text-ink-soft">No caption</span>}
+                  {photo.isSample ? <StarterBadge /> : null}
+                </p>
+                <div className="mt-3">
+                  <ConfirmAction
+                    action={deleteGalleryPhoto}
+                    fields={{ id: photo.id }}
+                    label="Remove photo"
+                    question="Remove this photo from the gallery?"
+                    confirmLabel="Yes, remove"
+                  />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </>
   );

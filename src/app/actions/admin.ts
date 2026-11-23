@@ -8,10 +8,12 @@ import {
   admins,
   contactMessages,
   events,
+  galleryPhotos,
   prayerRequests,
   sermons,
   serviceTimes,
   sessions,
+  siteImages,
   siteSettings,
 } from "@/db/schema";
 import {
@@ -23,6 +25,9 @@ import {
   verifyPassword,
 } from "@/lib/auth";
 import { allow, clientIp } from "@/lib/rate-limit";
+import sharp from "sharp";
+import { ensurePictureTables } from "@/lib/data";
+import { IMAGE_KEYS } from "@/lib/format";
 import { EMAIL_RE, cleanUrl, field, idOf, isISODate, type FormState } from "@/lib/validate";
 
 const MIN_PASSWORD = 10;
@@ -304,6 +309,124 @@ export async function deleteMessage(formData: FormData): Promise<void> {
   refresh();
 }
 
+/* ───────────────────────── Pictures & logo ───────────────────────── */
+
+// Any picture format is welcome: JPG, PNG, WebP, GIF, BMP, TIFF, HEIC/HEIF (iPhone),
+// AVIF and SVG. Everything is translated to WebP on the server, so the site can show it.
+const IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/bmp",
+  "image/tiff",
+  "image/heic",
+  "image/heif",
+  "image/avif",
+  "image/svg+xml",
+];
+// Types a browser can show on its own, kept as-is when conversion is not possible.
+const BROWSER_READY = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp", "image/avif", "image/svg+xml"];
+const MAX_UPLOAD_BYTES = 10_000_000;
+
+function imageKeyOf(formData: FormData): string {
+  const key = field(formData, "key", 20);
+  return (IMAGE_KEYS as readonly string[]).includes(key) ? key : "";
+}
+
+/**
+ * Reads a picture from an upload form and translates it into a web-friendly WebP file,
+ * shrunk to at most 2000 px across so it loads quickly on phones. Returns either the
+ * stored picture or a plain-language problem the visitor can act on.
+ */
+async function readImageFile(
+  formData: FormData,
+): Promise<{ data: string; contentType: string } | { problem: string }> {
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return { problem: "Choose a picture file first." };
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return { problem: "That file is bigger than 10 MB. Send a smaller picture, or shrink it on your phone first." };
+  }
+
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const type = file.type || "application/octet-stream";
+
+  // Translate the picture into WebP (this also shrinks big phone photos).
+  try {
+    const converted = await sharp(bytes, { animated: false })
+      .rotate() // respect how the photo was taken (phone orientation)
+      .resize({ width: 2000, withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+    if (converted.length > 0) return { data: converted.toString("base64"), contentType: "image/webp" };
+  } catch {
+    // Not a picture sharp can read — fall through to the checks below.
+  }
+
+  // Already a format browsers show directly (and sharp could not read it): keep it as it is.
+  if (BROWSER_READY.includes(type) && bytes.length <= MAX_UPLOAD_BYTES) {
+    return { data: bytes.toString("base64"), contentType: type };
+  }
+
+  return {
+    problem: IMAGE_TYPES.includes(type)
+      ? "That picture could not be read. Try sending it again as a JPG or PNG."
+      : "That file is not a picture the website can show. Please send a JPG, PNG, WebP, GIF, BMP, TIFF, HEIC, AVIF or SVG picture.",
+  };
+}
+
+export async function saveImage(_prev: FormState, formData: FormData): Promise<FormState> {
+  await guard();
+  await ensurePictureTables();
+  const key = imageKeyOf(formData);
+  if (!key) return fail("That picture slot is not recognised.");
+
+  const image = await readImageFile(formData);
+  if ("problem" in image) return fail(image.problem);
+
+  const values = { key, data: image.data, contentType: image.contentType, updatedAt: new Date() };
+  await db.insert(siteImages).values(values).onConflictDoUpdate({ target: siteImages.key, set: values });
+
+  refresh();
+  return { ok: true, message: "Updated — it is live on your website now." };
+}
+
+export async function deleteImage(formData: FormData): Promise<void> {
+  await guard();
+  await ensurePictureTables();
+  const key = imageKeyOf(formData);
+  if (key) await db.delete(siteImages).where(eq(siteImages.key, key));
+  refresh();
+}
+
+/* ───────────────────────── Gallery ───────────────────────── */
+
+export async function saveGalleryPhoto(_prev: FormState, formData: FormData): Promise<FormState> {
+  await guard();
+  await ensurePictureTables();
+  const image = await readImageFile(formData);
+  if ("problem" in image) return fail(image.problem);
+
+  const [last] = await db.select({ value: max(galleryPhotos.sortOrder) }).from(galleryPhotos);
+  await db.insert(galleryPhotos).values({
+    data: image.data,
+    contentType: image.contentType,
+    caption: field(formData, "caption", 160),
+    sortOrder: (last?.value ?? 0) + 1,
+  });
+
+  refresh();
+  return { ok: true, message: "Photo added to your gallery." };
+}
+
+export async function deleteGalleryPhoto(formData: FormData): Promise<void> {
+  await guard();
+  await ensurePictureTables();
+  const id = idOf(formData);
+  if (id) await db.delete(galleryPhotos).where(eq(galleryPhotos.id, id));
+  refresh();
+}
+
 /* ───────────────────────── Starter content ───────────────────────── */
 
 export async function clearSampleContent(): Promise<void> {
@@ -312,6 +435,7 @@ export async function clearSampleContent(): Promise<void> {
     await tx.delete(serviceTimes).where(eq(serviceTimes.isSample, true));
     await tx.delete(sermons).where(eq(sermons.isSample, true));
     await tx.delete(events).where(eq(events.isSample, true));
+    await tx.delete(galleryPhotos).where(eq(galleryPhotos.isSample, true));
   });
   refresh();
 }

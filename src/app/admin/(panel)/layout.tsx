@@ -5,7 +5,7 @@ import { logout } from "@/app/actions/admin";
 import { AdminNav } from "@/components/admin-client";
 import { Mark } from "@/components/ui";
 import { requireAdmin } from "@/lib/auth";
-import { getInboxCounts } from "@/lib/data";
+import { getInboxCounts, getUploadedImages } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +17,19 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const admin = await requireAdmin();
   const counts = await getInboxCounts();
+  const logoVersion = (await getUploadedImages()).get("logo");
 
   return (
     <div className="min-h-screen bg-[#eef1e6]">
       <header className="bg-night-950 text-paper">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-2 pt-4 sm:px-8">
           <Link href="/admin" className="flex items-center gap-3">
-            <Mark className="h-9 w-7 shrink-0 text-brass-300" />
+            {logoVersion ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={`/media/logo?v=${logoVersion}`} alt="" className="h-10 w-auto max-w-40 shrink-0 object-contain" />
+            ) : (
+              <Mark className="h-9 w-7 shrink-0 text-brass-300" />
+            )}
             <span className="leading-none">
               <span className="block font-display text-lg">Andronicus Richardson</span>
               <span className="mt-1 block text-[0.62rem] font-semibold uppercase tracking-[0.32em] text-brass-300">

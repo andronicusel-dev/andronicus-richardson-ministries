@@ -96,24 +96,22 @@ create table if not exists sessions (
   created_at timestamptz not null default now()
 );
 
--- Gallery photographs uploaded by staff for public display.
-create table if not exists gallery_photos (
-  id serial primary key,
-  program text not null default '',
-  caption text not null default '',
-  alt_text text not null default '',
-  photo_date date,
+-- Pictures and logo uploaded from the admin area (stored base64-encoded).
+create table if not exists site_images (
+  key text primary key,
+  data text not null,
   content_type text not null,
-  data_base64 text not null,
-  created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
--- Public website photographs and the ministry logo, uploaded by staff.
-create table if not exists site_images (
-  slot text primary key,
-  content_type text not null,
-  data_base64 text not null,
-  alt_text text not null default '',
-  updated_at timestamptz not null default now()
+-- Photos shown on the public Gallery page.
+create table if not exists gallery_photos (
+  id serial primary key,
+  data text not null default '',
+  content_type text not null default '',
+  file_path text not null default '',
+  caption text not null default '',
+  sort_order integer not null default 0,
+  is_sample boolean not null default false,
+  created_at timestamptz not null default now()
 );

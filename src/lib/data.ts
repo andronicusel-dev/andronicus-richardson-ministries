@@ -1,15 +1,106 @@
 import { cache } from "react";
-import { and, asc, count, desc, eq, gte } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   contactMessages,
   events,
   prayerRequests,
+  galleryPhotos,
   sermons,
   serviceTimes,
+  siteImages,
   siteSettings,
 } from "@/db/schema";
-import { parseISODate, shiftISO, todayISO } from "@/lib/format";
+import { parseISODate, shiftISO, todayISO, type ImageKey } from "@/lib/format";
+
+/**
+ * Creates the picture tables if they are missing, so a fresh deployment works
+ * without any manual database step. Run before reading or writing pictures.
+ */
+export async function ensurePictureTables(): Promise<void> {
+  await db.execute(sql`
+    create table if not exists site_images (
+      key text primary key,
+      data text not null,
+      content_type text not null,
+      updated_at timestamptz not null default now()
+    );
+    create table if not exists gallery_photos (
+      id serial primary key,
+      data text not null default '',
+      content_type text not null default '',
+      file_path text not null default '',
+      caption text not null default '',
+      sort_order integer not null default 0,
+      is_sample boolean not null default false,
+      created_at timestamptz not null default now()
+    );
+  `);
+}
+
+/** Standard pictures shipped with the site, used until the ministry uploads its own. */
+export const IMAGE_DEFAULTS: Record<ImageKey, string> = {
+  hero: "/images/hero-green.jpg",
+  doors: "/images/doors-green.jpg",
+  bible: "/images/bible-green.jpg",
+  pews: "/images/pews-green.jpg",
+  logo: "",
+  leader: "",
+};
+
+export type GalleryPhoto = typeof galleryPhotos.$inferSelect;
+
+/** Where a gallery photo is served from: its file for starter photos, the media route for uploads. */
+export function gallerySrc(photo: GalleryPhoto): string {
+  return photo.filePath || `/media/gallery/${photo.id}`;
+}
+
+const GALLERY_SAMPLES = [
+  { filePath: "/images/worship-green.jpg", caption: "Praise and worship" },
+  { filePath: "/images/hero-green.jpg", caption: "Sunday morning worship" },
+  { filePath: "/images/bible-green.jpg", caption: "Bible study" },
+  { filePath: "/images/doors-green.jpg", caption: "All are welcome" },
+  { filePath: "/images/pews-green.jpg", caption: "In the house of the Lord" },
+];
+
+/** Gallery photos, oldest first. Seeds starter examples the very first time only. */
+export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
+  await ensurePictureTables();
+  const rows = await db
+    .select()
+    .from(galleryPhotos)
+    .orderBy(asc(galleryPhotos.sortOrder), asc(galleryPhotos.id));
+  if (rows.length > 0) return rows;
+
+  // A marker row keeps the samples from coming back after the ministry deletes them all.
+  const [marker] = await db.select().from(siteImages).where(eq(siteImages.key, "gallery_seeded")).limit(1);
+  if (marker) return rows;
+
+  await db.transaction(async (tx) => {
+    await tx.insert(siteImages).values({ key: "gallery_seeded", data: "1", contentType: "text/plain" });
+    await tx.insert(galleryPhotos).values(
+      GALLERY_SAMPLES.map((sample, index) => ({ ...sample, sortOrder: index + 1, isSample: true })),
+    );
+  });
+  return db.select().from(galleryPhotos).orderBy(asc(galleryPhotos.sortOrder), asc(galleryPhotos.id));
+}
+
+/** Which picture slots have an uploaded picture, mapped to their last-changed time (for cache-busting). */
+export const getUploadedImages = cache(async (): Promise<Map<string, number>> => {
+  try {
+    await ensurePictureTables();
+    const rows = await db.select({ key: siteImages.key, updatedAt: siteImages.updatedAt }).from(siteImages);
+    return new Map(rows.map((row) => [row.key, row.updatedAt.getTime()]));
+  } catch {
+    return new Map();
+  }
+});
+
+/** The URL to use for a picture slot: the uploaded picture if there is one, else the standard one. */
+export function uploadedSrc(uploads: Map<string, number>, key: ImageKey): string {
+  const version = uploads.get(key);
+  return version ? `/media/${key}?v=${version}` : IMAGE_DEFAULTS[key];
+}
 
 export type Settings = typeof siteSettings.$inferSelect;
 export type ServiceTime = typeof serviceTimes.$inferSelect;
@@ -184,7 +275,7 @@ export const getInboxCounts = cache(async () => {
 export async function getAdminOverview() {
   await getSettings();
   const cutoff = upcomingCutoff();
-  const [[sermonTotal], [sermonOwn], [eventUpcoming], [eventOwn], [sampleServices], [sampleSermons], [sampleEvents]] =
+  const [[sermonTotal], [sermonOwn], [eventUpcoming], [eventOwn], [sampleServices], [sampleSermons], [sampleEvents], [sampleGallery]] =
     await Promise.all([
       db.select({ n: count() }).from(sermons),
       db.select({ n: count() }).from(sermons).where(eq(sermons.isSample, false)),
@@ -196,6 +287,7 @@ export async function getAdminOverview() {
       db.select({ n: count() }).from(serviceTimes).where(eq(serviceTimes.isSample, true)),
       db.select({ n: count() }).from(sermons).where(eq(sermons.isSample, true)),
       db.select({ n: count() }).from(events).where(eq(events.isSample, true)),
+      db.select({ n: count() }).from(galleryPhotos).where(eq(galleryPhotos.isSample, true)),
     ]);
   return {
     sermons: sermonTotal?.n ?? 0,
@@ -205,6 +297,7 @@ export async function getAdminOverview() {
     sampleServices: sampleServices?.n ?? 0,
     sampleSermons: sampleSermons?.n ?? 0,
     sampleEvents: sampleEvents?.n ?? 0,
+    sampleGallery: sampleGallery?.n ?? 0,
   };
 }
 

@@ -2,6 +2,10 @@
 
 export const CHURCH_NAME = "Andronicus Richardson Ministries";
 
+/** The picture slots that can be replaced from the admin area. */
+export const IMAGE_KEYS = ["hero", "doors", "bible", "pews", "logo", "leader"] as const;
+export type ImageKey = (typeof IMAGE_KEYS)[number];
+
 /** Parses a calendar date ("YYYY-MM-DD") as a UTC date so it never shifts by timezone. */
 export function parseISODate(iso: string): Date | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);

@@ -86,25 +86,23 @@ export const admins = pgTable("admins", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-/** Uploaded public-site photographs and logo, stored in Postgres so they survive redeployments. */
-export const siteImages = pgTable("site_images", {
-  slot: text("slot").primaryKey(),
-  contentType: text("content_type").notNull(),
-  dataBase64: text("data_base64").notNull(),
-  altText: text("alt_text").notNull().default(""),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
-
-/** Public program photographs, managed only by signed-in staff. */
+/** Photos shown on the public Gallery page. Uploaded ones store base64 data; starter ones point at a file. */
 export const galleryPhotos = pgTable("gallery_photos", {
   id: serial("id").primaryKey(),
-  program: text("program").notNull().default(""),
+  data: text("data").notNull().default(""),
+  contentType: text("content_type").notNull().default(""),
+  filePath: text("file_path").notNull().default(""),
   caption: text("caption").notNull().default(""),
-  altText: text("alt_text").notNull().default(""),
-  photoDate: date("photo_date", { mode: "string" }),
-  contentType: text("content_type").notNull(),
-  dataBase64: text("data_base64").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isSample: boolean("is_sample").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Pictures uploaded from the admin area, stored base64-encoded so no file hosting is needed. */
+export const siteImages = pgTable("site_images", {
+  key: text("key").primaryKey(),
+  data: text("data").notNull(),
+  contentType: text("content_type").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
